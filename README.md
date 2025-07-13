@@ -2,7 +2,7 @@
 
 A desktop application that transforms your screen into comedy gold! Take screenshots and get absolutely hilarious AI-generated jokes about anything you see.
 
-## 🎭 What We Do Now
+## What We Do Now
 
 Funly (formerly Free Cluely) is now **Jokester AI** - your personal comedy wingman that:
 - Takes screenshots of your screen
@@ -13,11 +13,11 @@ Funly (formerly Free Cluely) is now **Jokester AI** - your personal comedy wingm
 
 Built at **Sundai** as a fork of the original cheating assistant, we've transformed it into a comedy powerhouse that makes any content funnier!
 
-## 🎯 Original Repository
+## Original Repository
 
 This project is forked from the original "Interview Coder" repository. We've completely reimagined its purpose from a coding interview assistant to a comedy generation tool, maintaining the robust screenshot and AI analysis infrastructure while pivoting to pure entertainment. 
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### Prerequisites
 - Make sure you have Node.js installed on your computer
@@ -64,7 +64,7 @@ npm run build
 ```
 The built app will be in the `release` folder.
 
-### ⚠️ Important Notes
+### Important Notes
 
 1. **Closing the App**: 
    - Press `Cmd + Q` (Mac) or `Ctrl + Q` (Windows/Linux) to quit
@@ -101,7 +101,7 @@ If you see errors:
 3. Run `npm install` again
 4. Try running the app again using Method 1
 
-## 🎪 Comedy Features
+## Comedy Features
 
 - **Context-Aware Humor**: Jokes reference specific elements visible in your screenshots
 - **Multiple Formats**: Works with images, audio files, and live screen content
@@ -109,16 +109,16 @@ If you see errors:
 - **Instant Access**: Transparent overlay for comedy on demand
 - **Smart Analysis**: Powered by Google's Gemini 2.0-flash for intelligent content understanding
 
-## 🔧 Technical Stack
+## Technical Stack
 
 - **Frontend**: React 18 + TypeScript + Tailwind CSS
 - **Desktop**: Electron 33 with Node.js backend  
 - **AI**: Google Gemini 2.0-flash for content analysis
 - **Features**: Screenshot capture, audio processing, real-time overlays
 
-## 🤝 Contribution
+## Contribution
 
-Built at **Sundai** with ❤️ for comedy lovers everywhere! 
+Built at **Sundai** for comedy lovers everywhere! 
 
 We welcome contributions to make Funly even funnier:
 - Submit PRs for new comedy features
