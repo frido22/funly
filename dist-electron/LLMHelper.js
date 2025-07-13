@@ -8,7 +8,29 @@ const generative_ai_1 = require("@google/generative-ai");
 const fs_1 = __importDefault(require("fs"));
 class LLMHelper {
     model;
-    systemPrompt = `You are Wingman AI, a helpful, proactive assistant for any kind of problem or situation (not just coding). For any user input, analyze the situation, provide a clear problem statement, relevant context, and suggest several possible responses or actions the user could take next. Always explain your reasoning. Present your suggestions as a list of options or next steps.`;
+    systemPrompt = `You are Jokester AI – a witty, context-savvy comedian who excels at situational humor. Your superpower is reading the room and crafting jokes that perfectly match what's happening.
+
+CONTEXT AWARENESS RULES:
+- Analyze the specific situation, content, or problem presented
+- Identify the mood, tone, and context (coding problem, error message, UI element, etc.)
+- Look for visual cues, text content, or audio context to inform your humor
+- Match your joke style to the situation (technical puns for code, observational humor for UI, etc.)
+
+JOKE DELIVERY:
+1. Start with 1-2 context-specific jokes that directly relate to what you're seeing/hearing
+2. Use wordplay, puns, or observational humor that ties to the specific content
+3. If it's a technical problem, make programming/tech jokes
+4. If it's an error, make debugging/computer jokes
+5. If it's an image, make visual/observational jokes about what you see
+6. Keep jokes concise but clever - quality over quantity
+
+SITUATIONAL EXAMPLES:
+- For coding errors: "Looks like your code is having an identity crisis - it doesn't know what it wants to be!"
+- For UI issues: "This interface is playing hide and seek with the user"
+- For audio: "That audio clip sounds like it's been through a digital identity crisis"
+- For images: "I see what you did there - and I'm not sure if I should be impressed or concerned"
+
+When a JSON schema asks for "suggested_responses", fill it with context-relevant jokes that match the situation. Keep the key name unchanged so the app keeps working.`;
     constructor(apiKey) {
         const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
         this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -32,7 +54,7 @@ class LLMHelper {
     async extractProblemFromImages(imagePaths) {
         try {
             const imageParts = await Promise.all(imagePaths.map(path => this.fileToGenerativePart(path)));
-            const prompt = `${this.systemPrompt}\n\nYou are a wingman. Please analyze these images and extract the following information in JSON format:\n{
+            const prompt = `${this.systemPrompt}\n\nYou are a wingman. Please analyse these images and extract the following information in JSON format – remember: fill suggested_responses with jokes:\n{
   "problem_statement": "A clear statement of the problem or situation depicted in the images.",
   "context": "Relevant background or context from the images.",
   "suggested_responses": ["First possible answer or action", "Second possible answer or action", "..."],
@@ -49,7 +71,7 @@ class LLMHelper {
         }
     }
     async generateSolution(problemInfo) {
-        const prompt = `${this.systemPrompt}\n\nGiven this problem or situation:\n${JSON.stringify(problemInfo, null, 2)}\n\nPlease provide your response in the following JSON format:\n{
+        const prompt = `${this.systemPrompt}\n\nGiven this problem or situation:\n${JSON.stringify(problemInfo, null, 2)}\n\nPlease provide your joke-laden response in the following JSON format:\n{
   "solution": {
     "code": "The code or main answer here.",
     "problem_statement": "Restate the problem or situation.",
@@ -76,7 +98,7 @@ class LLMHelper {
     async debugSolutionWithImages(problemInfo, currentCode, debugImagePaths) {
         try {
             const imageParts = await Promise.all(debugImagePaths.map(path => this.fileToGenerativePart(path)));
-            const prompt = `${this.systemPrompt}\n\nYou are a wingman. Given:\n1. The original problem or situation: ${JSON.stringify(problemInfo, null, 2)}\n2. The current response or approach: ${currentCode}\n3. The debug information in the provided images\n\nPlease analyze the debug information and provide feedback in this JSON format:\n{
+            const prompt = `${this.systemPrompt}\n\nYou are a wingman. Given:\n1. The original problem or situation: ${JSON.stringify(problemInfo, null, 2)}\n2. The current response or approach: ${currentCode}\n3. The debug information in the provided images\n\nPlease analyse the debug information and provide comedic feedback in this JSON format:\n{
   "solution": {
     "code": "The code or main answer here.",
     "problem_statement": "Restate the problem or situation.",
@@ -106,7 +128,13 @@ class LLMHelper {
                     mimeType: "audio/mp3"
                 }
             };
-            const prompt = `${this.systemPrompt}\n\nDescribe this audio clip in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the audio. Do not return a structured JSON object, just answer naturally as you would to a user.`;
+            const prompt = `${this.systemPrompt}\n\nListen carefully to this audio clip and craft 1-2 witty jokes that relate to:
+- The tone, mood, or emotion in the audio
+- Any words, phrases, or sounds you can identify
+- The context or situation the audio suggests
+- The quality, length, or characteristics of the audio itself
+
+Make your jokes directly reference what you hear or infer from the audio. Be clever and context-aware.`;
             const result = await this.model.generateContent([prompt, audioPart]);
             const response = await result.response;
             const text = response.text();
@@ -125,7 +153,7 @@ class LLMHelper {
                     mimeType
                 }
             };
-            const prompt = `${this.systemPrompt}\n\nDescribe this audio clip in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the audio. Do not return a structured JSON object, just answer naturally as you would to a user and be concise.`;
+            const prompt = `${this.systemPrompt}\n\nCrack 1-3 short, witty jokes sparked by this audio clip, then (optionally) one snappy comment. Do not return a structured JSON object, just answer naturally as you would to a user and be concise.`;
             const result = await this.model.generateContent([prompt, audioPart]);
             const response = await result.response;
             const text = response.text();
@@ -145,7 +173,13 @@ class LLMHelper {
                     mimeType: "image/png"
                 }
             };
-            const prompt = `${this.systemPrompt}\n\nDescribe the content of this image in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the image. Do not return a structured JSON object, just answer naturally as you would to a user. Be concise and brief.`;
+            const prompt = `${this.systemPrompt}\n\nAnalyze this image carefully and tell 1-2 witty jokes that specifically relate to what you see. Look for:
+- Text content, code, or error messages
+- UI elements, buttons, or interface components  
+- Visual layout, colors, or design elements
+- Any technical or programming-related content
+
+Make your jokes directly reference the specific content you observe. Be concise but clever.`;
             const result = await this.model.generateContent([prompt, imagePart]);
             const response = await result.response;
             const text = response.text();

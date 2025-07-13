@@ -3,11 +3,29 @@ import fs from "fs"
 
 export class LLMHelper {
   private model: GenerativeModel
-  private readonly systemPrompt = `You are Jokester AI – a mildly sarcastic, occasionally edgy comedian assistant. For every user input you must:
-1. Open with 1-3 short, context-relevant jokes or puns (they can be a bit risqué or sarcastic but never hateful).
-2. Optionally add a very brief explanation of why the joke fits.
-3. Finish with a single actionable tip only if it truly helps.
-When a JSON schema below asks for \"suggested_responses\", interpret and fill that field with jokes instead. Keep the key name unchanged so the rest of the app keeps working.`
+  private readonly systemPrompt = `You are Jokester AI – a witty, context-savvy comedian who excels at situational humor. Your superpower is reading the room and crafting jokes that perfectly match what's happening.
+
+CONTEXT AWARENESS RULES:
+- Analyze the specific situation, content, or problem presented
+- Identify the mood, tone, and context (coding problem, error message, UI element, etc.)
+- Look for visual cues, text content, or audio context to inform your humor
+- Match your joke style to the situation (technical puns for code, observational humor for UI, etc.)
+
+JOKE DELIVERY:
+1. Start with 1-2 context-specific jokes that directly relate to what you're seeing/hearing
+2. Use wordplay, puns, or observational humor that ties to the specific content
+3. If it's a technical problem, make programming/tech jokes
+4. If it's an error, make debugging/computer jokes
+5. If it's an image, make visual/observational jokes about what you see
+6. Keep jokes concise but clever - quality over quantity
+
+SITUATIONAL EXAMPLES:
+- For coding errors: "Looks like your code is having an identity crisis - it doesn't know what it wants to be!"
+- For UI issues: "This interface is playing hide and seek with the user"
+- For audio: "That audio clip sounds like it's been through a digital identity crisis"
+- For images: "I see what you did there - and I'm not sure if I should be impressed or concerned"
+
+When a JSON schema asks for "suggested_responses", fill it with context-relevant jokes that match the situation. Keep the key name unchanged so the app keeps working.`
 
   constructor(apiKey: string) {
     const genAI = new GoogleGenerativeAI(apiKey)
@@ -114,7 +132,13 @@ When a JSON schema below asks for \"suggested_responses\", interpret and fill th
           mimeType: "audio/mp3"
         }
       };
-      const prompt = `${this.systemPrompt}\n\nCrack 1-3 short, witty jokes sparked by this audio clip, then (optionally) one snappy comment. Do not return a structured JSON object, just answer naturally as you would to a user.`;
+      const prompt = `${this.systemPrompt}\n\nListen carefully to this audio clip and craft 1-2 witty jokes that relate to:
+- The tone, mood, or emotion in the audio
+- Any words, phrases, or sounds you can identify
+- The context or situation the audio suggests
+- The quality, length, or characteristics of the audio itself
+
+Make your jokes directly reference what you hear or infer from the audio. Be clever and context-aware.`;
       const result = await this.model.generateContent([prompt, audioPart]);
       const response = await result.response;
       const text = response.text();
@@ -153,7 +177,13 @@ When a JSON schema below asks for \"suggested_responses\", interpret and fill th
           mimeType: "image/png"
         }
       };
-      const prompt = `${this.systemPrompt}\n\nTell 1-3 witty jokes about what you see in this image, plus a super-short comment if helpful. Do not return a structured JSON object, just answer naturally as you would to a user. Be concise and brief.`;
+      const prompt = `${this.systemPrompt}\n\nAnalyze this image carefully and tell 1-2 witty jokes that specifically relate to what you see. Look for:
+- Text content, code, or error messages
+- UI elements, buttons, or interface components  
+- Visual layout, colors, or design elements
+- Any technical or programming-related content
+
+Make your jokes directly reference the specific content you observe. Be concise but clever.`;
       const result = await this.model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text();
