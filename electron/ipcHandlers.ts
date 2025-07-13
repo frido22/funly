@@ -103,6 +103,63 @@ export function initializeIpcHandlers(appState: AppState): void {
     }
   })
 
+  // IPC handler for getting joke statistics
+  ipcMain.handle("get-joke-stats", async () => {
+    try {
+      const stats = appState.processingHelper.getLLMHelper().getJokeStats()
+      return stats
+    } catch (error: any) {
+      console.error("Error in get-joke-stats handler:", error)
+      throw error
+    }
+  })
+
+  // IPC handler for getting recent jokes
+  ipcMain.handle("get-recent-jokes", async (event, limit: number = 10) => {
+    try {
+      const jokes = appState.processingHelper.getLLMHelper().getRecentJokes(limit)
+      return jokes
+    } catch (error: any) {
+      console.error("Error in get-recent-jokes handler:", error)
+      throw error
+    }
+  })
+
+  // IPC handler for generating joke with memory
+  ipcMain.handle("generate-joke-with-memory", async (event, context: string) => {
+    try {
+      const joke = await appState.processingHelper.getLLMHelper().generateJokeWithMemory(context)
+      return joke
+    } catch (error: any) {
+      console.error("Error in generate-joke-with-memory handler:", error)
+      throw error
+    }
+  })
+
+  // IPC handler for finding similar jokes (RAG search)
+  ipcMain.handle("find-similar-jokes", async (event, query: string, limit: number = 5) => {
+    try {
+      const jokes = await appState.processingHelper.getLLMHelper().findSimilarJokes(query, limit)
+      return jokes
+    } catch (error: any) {
+      console.error("Error in find-similar-jokes handler:", error)
+      throw error
+    }
+  })
+
+
+
+  // IPC handler for getting embedding dimensions
+  ipcMain.handle("get-embedding-dimensions", async () => {
+    try {
+      const dimensions = appState.processingHelper.getLLMHelper().getEmbeddingDimensions()
+      return dimensions
+    } catch (error: any) {
+      console.error("Error in get-embedding-dimensions handler:", error)
+      throw error
+    }
+  })
+
   ipcMain.handle("quit-app", () => {
     app.quit()
   })

@@ -31,6 +31,11 @@ interface ElectronAPI {
   analyzeAudioFromBase64: (data: string, mimeType: string) => Promise<{ text: string; timestamp: number }>
   analyzeAudioFile: (path: string) => Promise<{ text: string; timestamp: number }>
   analyzeImageFile: (path: string) => Promise<void>
+  getJokeStats: () => Promise<{ total: number; recent: number }>
+  getRecentJokes: (limit?: number) => Promise<Array<{ id: string; joke: string; timestamp: number; hash: string }>>
+  generateJokeWithMemory: (context: string) => Promise<string>
+  findSimilarJokes: (query: string, limit?: number) => Promise<Array<{ id: string; joke: string; timestamp: number; hash: string }>>
+  getEmbeddingDimensions: () => Promise<number>
   quitApp: () => Promise<void>
 }
 
@@ -165,5 +170,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   analyzeAudioFromBase64: (data: string, mimeType: string) => ipcRenderer.invoke("analyze-audio-base64", data, mimeType),
   analyzeAudioFile: (path: string) => ipcRenderer.invoke("analyze-audio-file", path),
   analyzeImageFile: (path: string) => ipcRenderer.invoke("analyze-image-file", path),
+  getJokeStats: () => ipcRenderer.invoke("get-joke-stats"),
+  getRecentJokes: (limit?: number) => ipcRenderer.invoke("get-recent-jokes", limit),
+  generateJokeWithMemory: (context: string) => ipcRenderer.invoke("generate-joke-with-memory", context),
+  findSimilarJokes: (query: string, limit?: number) => ipcRenderer.invoke("find-similar-jokes", query, limit),
+  getEmbeddingDimensions: () => ipcRenderer.invoke("get-embedding-dimensions"),
   quitApp: () => ipcRenderer.invoke("quit-app")
 } as ElectronAPI)

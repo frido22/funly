@@ -1,8 +1,10 @@
 import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai"
 import fs from "fs"
+import { JokeMemory } from "./JokeMemory"
 
 export class LLMHelper {
   private model: GenerativeModel
+  private jokeMemory: JokeMemory
   private readonly systemPrompt = `You are Jokester AI – a witty, context-savvy comedian who excels at situational humor. Your superpower is reading the room and crafting jokes that perfectly match what's happening.
 
 CONTEXT AWARENESS RULES:
@@ -30,6 +32,7 @@ When a JSON schema asks for "suggested_responses", fill it with context-relevant
   constructor(apiKey: string) {
     const genAI = new GoogleGenerativeAI(apiKey)
     this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
+    this.jokeMemory = new JokeMemory(apiKey)
   }
 
   private async fileToGenerativePart(imagePath: string) {
@@ -142,6 +145,10 @@ Make your jokes directly reference what you hear or infer from the audio. Be cle
       const result = await this.model.generateContent([prompt, audioPart]);
       const response = await result.response;
       const text = response.text();
+      
+      // Add to memory
+      await this.jokeMemory.addJoke(text)
+      
       return { text, timestamp: Date.now() };
     } catch (error) {
       console.error("Error analyzing audio file:", error);
@@ -161,6 +168,10 @@ Make your jokes directly reference what you hear or infer from the audio. Be cle
       const result = await this.model.generateContent([prompt, audioPart]);
       const response = await result.response;
       const text = response.text();
+      
+      // Add to memory
+      await this.jokeMemory.addJoke(text)
+      
       return { text, timestamp: Date.now() };
     } catch (error) {
       console.error("Error analyzing audio from base64:", error);
@@ -187,10 +198,65 @@ Make your jokes directly reference the specific content you observe. Be concise 
       const result = await this.model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text();
+      
+      // Add to memory
+      await this.jokeMemory.addJoke(text)
+      
       return { text, timestamp: Date.now() };
     } catch (error) {
       console.error("Error analyzing image file:", error);
       throw error;
     }
+  }
+
+  public async generateJokeWithMemory(context: string, maxAttempts: number = 3): Promise<string> {
+    console.log(`🎭 GENERATING JOKE for context: "${context}"`)
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const prompt = `${this.systemPrompt}\n\nGenerate a fresh, unique joke for this context: ${context}\n\nMake sure it's original and hasn't been used before. Be creative and contextually relevant.`;
+        
+        const result = await this.model.generateContent(prompt);
+        const response = await result.response;
+        const joke = response.text().trim();
+        
+        console.log(`📝 Attempt ${attempt}: Generated joke: "${joke}"`)
+        
+        // Check if this joke is similar to existing ones
+        if (!(await this.jokeMemory.isJokeSimilar(joke))) {
+          console.log(`✅ UNIQUE JOKE ACCEPTED: "${joke}"`)
+          await this.jokeMemory.addJoke(joke);
+          return joke;
+        }
+        
+        console.log(`🔄 Attempt ${attempt}: Joke too similar, trying again...`);
+      } catch (error) {
+        console.error(`❌ Error generating joke attempt ${attempt}:`, error);
+      }
+    }
+    
+    // If all attempts failed, return a fallback joke
+    console.log(`⚠️ All ${maxAttempts} attempts failed, using fallback joke`)
+    const fallbackJoke = "Well, my joke generator is having a moment. Let's call it a day and try again later! 😅";
+    await this.jokeMemory.addJoke(fallbackJoke);
+    return fallbackJoke;
+  }
+
+  public getJokeStats() {
+    return this.jokeMemory.getJokeStats();
+  }
+
+  public getRecentJokes(limit: number = 10) {
+    return this.jokeMemory.getRecentJokes(limit);
+  }
+
+  public async findSimilarJokes(query: string, limit: number = 5) {
+    return this.jokeMemory.findSimilarJokes(query, limit);
+  }
+
+
+
+  public getEmbeddingDimensions() {
+    return this.jokeMemory.getEmbeddingDimensions();
   }
 } 

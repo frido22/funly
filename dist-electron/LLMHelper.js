@@ -6,8 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LLMHelper = void 0;
 const generative_ai_1 = require("@google/generative-ai");
 const fs_1 = __importDefault(require("fs"));
+const JokeMemory_1 = require("./JokeMemory");
 class LLMHelper {
     model;
+    jokeMemory;
     systemPrompt = `You are Jokester AI – a witty, context-savvy comedian who excels at situational humor. Your superpower is reading the room and crafting jokes that perfectly match what's happening.
 
 CONTEXT AWARENESS RULES:
@@ -34,6 +36,7 @@ When a JSON schema asks for "suggested_responses", fill it with context-relevant
     constructor(apiKey) {
         const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
         this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        this.jokeMemory = new JokeMemory_1.JokeMemory(apiKey);
     }
     async fileToGenerativePart(imagePath) {
         const imageData = await fs_1.default.promises.readFile(imagePath);
@@ -138,6 +141,8 @@ Make your jokes directly reference what you hear or infer from the audio. Be cle
             const result = await this.model.generateContent([prompt, audioPart]);
             const response = await result.response;
             const text = response.text();
+            // Add to memory
+            await this.jokeMemory.addJoke(text);
             return { text, timestamp: Date.now() };
         }
         catch (error) {
@@ -157,6 +162,8 @@ Make your jokes directly reference what you hear or infer from the audio. Be cle
             const result = await this.model.generateContent([prompt, audioPart]);
             const response = await result.response;
             const text = response.text();
+            // Add to memory
+            await this.jokeMemory.addJoke(text);
             return { text, timestamp: Date.now() };
         }
         catch (error) {
@@ -183,12 +190,53 @@ Make your jokes directly reference the specific content you observe. Be concise 
             const result = await this.model.generateContent([prompt, imagePart]);
             const response = await result.response;
             const text = response.text();
+            // Add to memory
+            await this.jokeMemory.addJoke(text);
             return { text, timestamp: Date.now() };
         }
         catch (error) {
             console.error("Error analyzing image file:", error);
             throw error;
         }
+    }
+    async generateJokeWithMemory(context, maxAttempts = 3) {
+        console.log(`🎭 GENERATING JOKE for context: "${context}"`);
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                const prompt = `${this.systemPrompt}\n\nGenerate a fresh, unique joke for this context: ${context}\n\nMake sure it's original and hasn't been used before. Be creative and contextually relevant.`;
+                const result = await this.model.generateContent(prompt);
+                const response = await result.response;
+                const joke = response.text().trim();
+                console.log(`📝 Attempt ${attempt}: Generated joke: "${joke}"`);
+                // Check if this joke is similar to existing ones
+                if (!(await this.jokeMemory.isJokeSimilar(joke))) {
+                    console.log(`✅ UNIQUE JOKE ACCEPTED: "${joke}"`);
+                    await this.jokeMemory.addJoke(joke);
+                    return joke;
+                }
+                console.log(`🔄 Attempt ${attempt}: Joke too similar, trying again...`);
+            }
+            catch (error) {
+                console.error(`❌ Error generating joke attempt ${attempt}:`, error);
+            }
+        }
+        // If all attempts failed, return a fallback joke
+        console.log(`⚠️ All ${maxAttempts} attempts failed, using fallback joke`);
+        const fallbackJoke = "Well, my joke generator is having a moment. Let's call it a day and try again later! 😅";
+        await this.jokeMemory.addJoke(fallbackJoke);
+        return fallbackJoke;
+    }
+    getJokeStats() {
+        return this.jokeMemory.getJokeStats();
+    }
+    getRecentJokes(limit = 10) {
+        return this.jokeMemory.getRecentJokes(limit);
+    }
+    async findSimilarJokes(query, limit = 5) {
+        return this.jokeMemory.findSimilarJokes(query, limit);
+    }
+    getEmbeddingDimensions() {
+        return this.jokeMemory.getEmbeddingDimensions();
     }
 }
 exports.LLMHelper = LLMHelper;

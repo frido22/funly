@@ -94,6 +94,61 @@ function initializeIpcHandlers(appState) {
             throw error;
         }
     });
+    // IPC handler for getting joke statistics
+    electron_1.ipcMain.handle("get-joke-stats", async () => {
+        try {
+            const stats = appState.processingHelper.getLLMHelper().getJokeStats();
+            return stats;
+        }
+        catch (error) {
+            console.error("Error in get-joke-stats handler:", error);
+            throw error;
+        }
+    });
+    // IPC handler for getting recent jokes
+    electron_1.ipcMain.handle("get-recent-jokes", async (event, limit = 10) => {
+        try {
+            const jokes = appState.processingHelper.getLLMHelper().getRecentJokes(limit);
+            return jokes;
+        }
+        catch (error) {
+            console.error("Error in get-recent-jokes handler:", error);
+            throw error;
+        }
+    });
+    // IPC handler for generating joke with memory
+    electron_1.ipcMain.handle("generate-joke-with-memory", async (event, context) => {
+        try {
+            const joke = await appState.processingHelper.getLLMHelper().generateJokeWithMemory(context);
+            return joke;
+        }
+        catch (error) {
+            console.error("Error in generate-joke-with-memory handler:", error);
+            throw error;
+        }
+    });
+    // IPC handler for finding similar jokes (RAG search)
+    electron_1.ipcMain.handle("find-similar-jokes", async (event, query, limit = 5) => {
+        try {
+            const jokes = await appState.processingHelper.getLLMHelper().findSimilarJokes(query, limit);
+            return jokes;
+        }
+        catch (error) {
+            console.error("Error in find-similar-jokes handler:", error);
+            throw error;
+        }
+    });
+    // IPC handler for getting embedding dimensions
+    electron_1.ipcMain.handle("get-embedding-dimensions", async () => {
+        try {
+            const dimensions = appState.processingHelper.getLLMHelper().getEmbeddingDimensions();
+            return dimensions;
+        }
+        catch (error) {
+            console.error("Error in get-embedding-dimensions handler:", error);
+            throw error;
+        }
+    });
     electron_1.ipcMain.handle("quit-app", () => {
         electron_1.app.quit();
     });

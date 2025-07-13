@@ -111,6 +111,11 @@ electron_1.contextBridge.exposeInMainWorld("electronAPI", {
     analyzeAudioFromBase64: (data, mimeType) => electron_1.ipcRenderer.invoke("analyze-audio-base64", data, mimeType),
     analyzeAudioFile: (path) => electron_1.ipcRenderer.invoke("analyze-audio-file", path),
     analyzeImageFile: (path) => electron_1.ipcRenderer.invoke("analyze-image-file", path),
+    getJokeStats: () => electron_1.ipcRenderer.invoke("get-joke-stats"),
+    getRecentJokes: (limit) => electron_1.ipcRenderer.invoke("get-recent-jokes", limit),
+    generateJokeWithMemory: (context) => electron_1.ipcRenderer.invoke("generate-joke-with-memory", context),
+    findSimilarJokes: (query, limit) => electron_1.ipcRenderer.invoke("find-similar-jokes", query, limit),
+    getEmbeddingDimensions: () => electron_1.ipcRenderer.invoke("get-embedding-dimensions"),
     quitApp: () => electron_1.ipcRenderer.invoke("quit-app")
 });
 //# sourceMappingURL=preload.js.map
