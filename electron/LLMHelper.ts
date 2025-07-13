@@ -3,7 +3,11 @@ import fs from "fs"
 
 export class LLMHelper {
   private model: GenerativeModel
-  private readonly systemPrompt = `You are Wingman AI, a helpful, proactive assistant for any kind of problem or situation (not just coding). For any user input, analyze the situation, provide a clear problem statement, relevant context, and suggest several possible responses or actions the user could take next. Always explain your reasoning. Present your suggestions as a list of options or next steps.`
+  private readonly systemPrompt = `You are Jokester AI – a mildly sarcastic, occasionally edgy comedian assistant. For every user input you must:
+1. Open with 1-3 short, context-relevant jokes or puns (they can be a bit risqué or sarcastic but never hateful).
+2. Optionally add a very brief explanation of why the joke fits.
+3. Finish with a single actionable tip only if it truly helps.
+When a JSON schema below asks for \"suggested_responses\", interpret and fill that field with jokes instead. Keep the key name unchanged so the rest of the app keeps working.`
 
   constructor(apiKey: string) {
     const genAI = new GoogleGenerativeAI(apiKey)
@@ -32,7 +36,7 @@ export class LLMHelper {
     try {
       const imageParts = await Promise.all(imagePaths.map(path => this.fileToGenerativePart(path)))
       
-      const prompt = `${this.systemPrompt}\n\nYou are a wingman. Please analyze these images and extract the following information in JSON format:\n{
+      const prompt = `${this.systemPrompt}\n\nYou are a wingman. Please analyse these images and extract the following information in JSON format – remember: fill suggested_responses with jokes:\n{
   "problem_statement": "A clear statement of the problem or situation depicted in the images.",
   "context": "Relevant background or context from the images.",
   "suggested_responses": ["First possible answer or action", "Second possible answer or action", "..."],
@@ -50,7 +54,7 @@ export class LLMHelper {
   }
 
   public async generateSolution(problemInfo: any) {
-    const prompt = `${this.systemPrompt}\n\nGiven this problem or situation:\n${JSON.stringify(problemInfo, null, 2)}\n\nPlease provide your response in the following JSON format:\n{
+    const prompt = `${this.systemPrompt}\n\nGiven this problem or situation:\n${JSON.stringify(problemInfo, null, 2)}\n\nPlease provide your joke-laden response in the following JSON format:\n{
   "solution": {
     "code": "The code or main answer here.",
     "problem_statement": "Restate the problem or situation.",
@@ -79,7 +83,7 @@ export class LLMHelper {
     try {
       const imageParts = await Promise.all(debugImagePaths.map(path => this.fileToGenerativePart(path)))
       
-      const prompt = `${this.systemPrompt}\n\nYou are a wingman. Given:\n1. The original problem or situation: ${JSON.stringify(problemInfo, null, 2)}\n2. The current response or approach: ${currentCode}\n3. The debug information in the provided images\n\nPlease analyze the debug information and provide feedback in this JSON format:\n{
+      const prompt = `${this.systemPrompt}\n\nYou are a wingman. Given:\n1. The original problem or situation: ${JSON.stringify(problemInfo, null, 2)}\n2. The current response or approach: ${currentCode}\n3. The debug information in the provided images\n\nPlease analyse the debug information and provide comedic feedback in this JSON format:\n{
   "solution": {
     "code": "The code or main answer here.",
     "problem_statement": "Restate the problem or situation.",
@@ -110,7 +114,7 @@ export class LLMHelper {
           mimeType: "audio/mp3"
         }
       };
-      const prompt = `${this.systemPrompt}\n\nDescribe this audio clip in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the audio. Do not return a structured JSON object, just answer naturally as you would to a user.`;
+      const prompt = `${this.systemPrompt}\n\nCrack 1-3 short, witty jokes sparked by this audio clip, then (optionally) one snappy comment. Do not return a structured JSON object, just answer naturally as you would to a user.`;
       const result = await this.model.generateContent([prompt, audioPart]);
       const response = await result.response;
       const text = response.text();
@@ -129,7 +133,7 @@ export class LLMHelper {
           mimeType
         }
       };
-      const prompt = `${this.systemPrompt}\n\nDescribe this audio clip in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the audio. Do not return a structured JSON object, just answer naturally as you would to a user and be concise.`;
+      const prompt = `${this.systemPrompt}\n\nCrack 1-3 short, witty jokes sparked by this audio clip, then (optionally) one snappy comment. Do not return a structured JSON object, just answer naturally as you would to a user and be concise.`;
       const result = await this.model.generateContent([prompt, audioPart]);
       const response = await result.response;
       const text = response.text();
@@ -149,7 +153,7 @@ export class LLMHelper {
           mimeType: "image/png"
         }
       };
-      const prompt = `${this.systemPrompt}\n\nDescribe the content of this image in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the image. Do not return a structured JSON object, just answer naturally as you would to a user. Be concise and brief.`;
+      const prompt = `${this.systemPrompt}\n\nTell 1-3 witty jokes about what you see in this image, plus a super-short comment if helpful. Do not return a structured JSON object, just answer naturally as you would to a user. Be concise and brief.`;
       const result = await this.model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text();
