@@ -15,7 +15,7 @@ Built at **Sundai** as a fork of the original cheating assistant, we've transfor
 
 ## Original Repository
 
-This project is forked from the original "Interview Coder" repository. We've completely reimagined its purpose from a coding interview assistant to a comedy generation tool, maintaining the robust screenshot and AI analysis infrastructure while pivoting to pure entertainment. 
+This project is forked from the original 'free-cluley" repository. We've completely reimagined its purpose from a coding interview assistant to a comedy generation tool, maintaining the robust screenshot and AI analysis infrastructure while pivoting to pure entertainment. 
 
 ## Quick Start Guide
 
