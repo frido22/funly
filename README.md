@@ -1,6 +1,21 @@
-# Free Cluely
+# Funly - Jokester AI
 
-A desktop application to help you cheat on everything. 
+A desktop application that transforms your screen into comedy gold! Take screenshots and get absolutely hilarious AI-generated jokes about anything you see.
+
+## 🎭 What We Do Now
+
+Funly (formerly Free Cluely) is now **Jokester AI** - your personal comedy wingman that:
+- Takes screenshots of your screen
+- Analyzes images, audio, and content using Google's Gemini AI
+- Generates three absolutely hilarious, context-aware jokes
+- Delivers comedy gold with wordplay, unexpected twists, and brilliant observations
+- Creates an always-on-top transparent overlay for instant laughs
+
+Built at **Sundai** as a fork of the original cheating assistant, we've transformed it into a comedy powerhouse that makes any content funnier!
+
+## 🎯 Original Repository
+
+This project is forked from the original "Interview Coder" repository. We've completely reimagined its purpose from a coding interview assistant to a comedy generation tool, maintaining the robust screenshot and AI analysis infrastructure while pivoting to pure entertainment. 
 
 ## 🚀 Quick Start Guide
 
@@ -56,7 +71,13 @@ The built app will be in the `release` folder.
    - Or use Activity Monitor/Task Manager to close `Interview Coder`
    - The X button currently doesn't work (known issue)
 
-2. **If the app doesn't start**:
+2. **How It Works**:
+   - Take a screenshot using `Cmd/Ctrl + H`
+   - Press `Cmd/Enter` to generate three hilarious jokes
+   - The transparent overlay stays on top for instant comedy access
+   - Works with any content: websites, code, documents, images, etc.
+
+3. **If the app doesn't start**:
    - Make sure no other app is using port 5180
    - Try killing existing processes:
      ```bash
@@ -66,10 +87,10 @@ The built app will be in the `release` folder.
      kill [PID]
      ```
 
-3. **Keyboard Shortcuts**:
+4. **Keyboard Shortcuts**:
    - `Cmd/Ctrl + B`: Toggle window visibility
    - `Cmd/Ctrl + H`: Take screenshot
-   - 'Cmd/Enter': Get solution
+   - `Cmd/Enter`: Generate jokes from screenshot
    - `Cmd/Ctrl + Arrow Keys`: Move window
 
 ### Troubleshooting
@@ -80,8 +101,29 @@ If you see errors:
 3. Run `npm install` again
 4. Try running the app again using Method 1
 
-## Contribution
+## 🎪 Comedy Features
 
-I'm unable to maintain this repo actively because I do not have the time for it. Please do not create issues, if you have any PRs feel free to create them and i'll review and merge it.
+- **Context-Aware Humor**: Jokes reference specific elements visible in your screenshots
+- **Multiple Formats**: Works with images, audio files, and live screen content
+- **Stand-up Quality**: AI trained to deliver memorable, quotable one-liners
+- **Instant Access**: Transparent overlay for comedy on demand
+- **Smart Analysis**: Powered by Google's Gemini 2.0-flash for intelligent content understanding
 
-If you are looking to integrate this for your company, i can work with you to create custom solutions. 
+## 🔧 Technical Stack
+
+- **Frontend**: React 18 + TypeScript + Tailwind CSS
+- **Desktop**: Electron 33 with Node.js backend  
+- **AI**: Google Gemini 2.0-flash for content analysis
+- **Features**: Screenshot capture, audio processing, real-time overlays
+
+## 🤝 Contribution
+
+Built at **Sundai** with ❤️ for comedy lovers everywhere! 
+
+We welcome contributions to make Funly even funnier:
+- Submit PRs for new comedy features
+- Enhance joke generation algorithms  
+- Improve UI/UX for better comedy delivery
+- Add new content analysis capabilities
+
+For custom comedy solutions or integrations, reach out to discuss collaboration opportunities! 
