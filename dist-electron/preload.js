@@ -106,6 +106,13 @@ electron_1.contextBridge.exposeInMainWorld("electronAPI", {
             electron_1.ipcRenderer.removeListener(exports.PROCESSING_EVENTS.UNAUTHORIZED, subscription);
         };
     },
+    onStartVoiceRecording: (callback) => {
+        const subscription = () => callback();
+        electron_1.ipcRenderer.on("start-voice-recording", subscription);
+        return () => {
+            electron_1.ipcRenderer.removeListener("start-voice-recording", subscription);
+        };
+    },
     moveWindowLeft: () => electron_1.ipcRenderer.invoke("move-window-left"),
     moveWindowRight: () => electron_1.ipcRenderer.invoke("move-window-right"),
     analyzeAudioFromBase64: (data, mimeType) => electron_1.ipcRenderer.invoke("analyze-audio-base64", data, mimeType),

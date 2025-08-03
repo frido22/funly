@@ -13,6 +13,21 @@ const SolutionCommands: React.FC<SolutionCommandsProps> = ({
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
 
+  // Listen for voice recording shortcut
+  useEffect(() => {
+    const handleVoiceRecordingShortcut = () => {
+      // Trigger the same auto-recording logic that happens in the Solutions page
+      const event = new CustomEvent('trigger-auto-recording')
+      window.dispatchEvent(event)
+    }
+
+    window.electronAPI.onStartVoiceRecording(handleVoiceRecordingShortcut)
+
+    return () => {
+      // Cleanup listener if needed
+    }
+  }, [])
+
   useEffect(() => {
     if (onTooltipVisibilityChange) {
       let tooltipHeight = 0
@@ -77,6 +92,19 @@ const SolutionCommands: React.FC<SolutionCommandsProps> = ({
               </div>
             </div>
           )}
+
+          {/* Voice Recording */}
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <span className="text-[11px] leading-none">Record</span>
+            <div className="flex gap-1">
+              <button className="bg-white/10 hover:bg-white/20 transition-colors rounded-md px-1.5 py-1 text-[11px] leading-none text-white/70">
+                ⌘
+              </button>
+              <button className="bg-white/10 hover:bg-white/20 transition-colors rounded-md px-1.5 py-1 text-[11px] leading-none text-white/70">
+                M
+              </button>
+            </div>
+          </div>
 
           {/* Start Over */}
           <div className="flex items-center gap-2 whitespace-nowrap">
@@ -174,6 +202,23 @@ const SolutionCommands: React.FC<SolutionCommandsProps> = ({
                           added screenshots.
                         </p>
                       </div>
+                      {/* Voice Recording Command */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="whitespace-nowrap">Voice Recording</span>
+                          <div className="flex gap-1">
+                            <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                              ⌘
+                            </span>
+                            <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                              M
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-[10px] leading-relaxed text-white/70 whitespace-nowrap truncate">
+                          Start voice recording to capture audio problems.
+                        </p>
+                      </div>
                       {/* Start Over Command */}
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">
@@ -189,6 +234,23 @@ const SolutionCommands: React.FC<SolutionCommandsProps> = ({
                         </div>
                         <p className="text-[10px] leading-relaxed text-white/70 whitespace-nowrap truncate">
                           Start fresh with a new question.
+                        </p>
+                      </div>
+                      {/* Window Movement Commands */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="whitespace-nowrap">Move Window</span>
+                          <div className="flex gap-1">
+                            <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                              ⌘
+                            </span>
+                            <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                              ↑↓←→
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-[10px] leading-relaxed text-white/70 whitespace-nowrap truncate">
+                          Move window position with arrow keys.
                         </p>
                       </div>
                     </div>

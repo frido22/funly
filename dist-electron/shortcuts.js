@@ -77,6 +77,14 @@ class ShortcutsHelper {
                 }
             }
         });
+        // Voice recording shortcut
+        electron_1.globalShortcut.register("CommandOrControl+M", () => {
+            console.log("Command/Ctrl + M pressed. Triggering voice recording...");
+            const mainWindow = this.appState.getMainWindow();
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send("start-voice-recording");
+            }
+        });
         // Unregister shortcuts when quitting
         electron_1.app.on("will-quit", () => {
             electron_1.globalShortcut.unregisterAll();

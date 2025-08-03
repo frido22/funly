@@ -228,6 +228,46 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
     updateDimensions()
 
     // Set up event listeners
+    const handleTriggerAutoRecording = async () => {
+      // Start the same audio recording logic
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        const mediaRecorder = new MediaRecorder(stream)
+        const chunks: Blob[] = []
+        mediaRecorder.ondataavailable = (e) => chunks.push(e.data)
+        mediaRecorder.start()
+        setAudioRecording(true)
+        // Record for 5 seconds
+        setTimeout(() => mediaRecorder.stop(), 5000)
+        mediaRecorder.onstop = async () => {
+          setAudioRecording(false)
+          const blob = new Blob(chunks, { type: chunks[0]?.type || 'audio/webm' })
+          const reader = new FileReader()
+          reader.onloadend = async () => {
+            const base64Data = (reader.result as string).split(',')[1]
+            try {
+              const result = await window.electronAPI.analyzeAudioFromBase64(
+                base64Data,
+                blob.type
+              )
+              setAudioResult(result)
+            } catch (err) {
+              console.error('Error analyzing audio:', err)
+            }
+            // Stop all tracks
+            stream.getTracks().forEach(track => track.stop())
+          }
+          reader.readAsDataURL(blob)
+        }
+      } catch (err) {
+        console.error('Error accessing microphone:', err)
+        setAudioRecording(false)
+      }
+    }
+    
+    // Add custom event listener for voice recording shortcut
+    window.addEventListener('trigger-auto-recording', handleTriggerAutoRecording)
+
     const cleanupFunctions = [
       window.electronAPI.onScreenshotTaken(() => refetch()),
       window.electronAPI.onResetView(() => {
@@ -378,6 +418,7 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
     return () => {
       resizeObserver.disconnect()
       cleanupFunctions.forEach((cleanup) => cleanup())
+      window.removeEventListener('trigger-auto-recording', handleTriggerAutoRecording)
     }
   }, [isTooltipVisible, tooltipHeight])
 

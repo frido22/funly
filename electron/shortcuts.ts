@@ -90,6 +90,15 @@ export class ShortcutsHelper {
       }
     })
 
+    // Voice recording shortcut
+    globalShortcut.register("CommandOrControl+M", () => {
+      console.log("Command/Ctrl + M pressed. Triggering voice recording...")
+      const mainWindow = this.appState.getMainWindow()
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("start-voice-recording")
+      }
+    })
+
     // Unregister shortcuts when quitting
     app.on("will-quit", () => {
       globalShortcut.unregisterAll()

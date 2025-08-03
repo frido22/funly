@@ -17,6 +17,19 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
   const [audioResult, setAudioResult] = useState<string | null>(null)
   const chunks = useRef<Blob[]>([])
 
+  // Listen for voice recording shortcut
+  useEffect(() => {
+    const handleVoiceRecordingShortcut = () => {
+      handleRecordClick()
+    }
+
+    window.electronAPI.onStartVoiceRecording(handleVoiceRecordingShortcut)
+
+    return () => {
+      // Cleanup listener if needed
+    }
+  }, [])
+
   useEffect(() => {
     let tooltipHeight = 0
     if (tooltipRef.current && isTooltipVisible) {
@@ -115,19 +128,17 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
           </div>
         )}
 
-        {/* Voice Recording Button */}
+        {/* Voice Recording Button with Shortcut Display */}
         <div className="flex items-center gap-2">
-          <button
-            className={`bg-white/10 hover:bg-white/20 transition-colors rounded-md px-2 py-1 text-[11px] leading-none text-white/70 flex items-center gap-1 ${isRecording ? 'bg-red-500/70 hover:bg-red-500/90' : ''}`}
-            onClick={handleRecordClick}
-            type="button"
-          >
-            {isRecording ? (
-              <span className="animate-pulse">● Stop Recording</span>
-            ) : (
-              <span>🎤 Record Voice</span>
-            )}
-          </button>
+          <span className="text-[11px] leading-none">Record</span>
+          <div className="flex gap-1">
+            <button className="bg-white/10 hover:bg-white/20 transition-colors rounded-md px-1.5 py-1 text-[11px] leading-none text-white/70">
+              ⌘
+            </button>
+            <button className="bg-white/10 hover:bg-white/20 transition-colors rounded-md px-1.5 py-1 text-[11px] leading-none text-white/70">
+              M
+            </button>
+          </div>
         </div>
 
         {/* Question mark with tooltip */}
@@ -187,6 +198,24 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
                       </p>
                     </div>
 
+                    {/* Voice Recording Command */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="truncate">Voice Recording</span>
+                        <div className="flex gap-1 flex-shrink-0">
+                          <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                            ⌘
+                          </span>
+                          <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                            M
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] leading-relaxed text-white/70 truncate">
+                        Start voice recording to capture audio problems.
+                      </p>
+                    </div>
+
                     {/* Solve Command */}
                     <div className="space-y-1">
                       <div className="flex items-center justify-between">
@@ -202,6 +231,24 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
                       </div>
                       <p className="text-[10px] leading-relaxed text-white/70 truncate">
                         Generate a solution based on the current problem.
+                      </p>
+                    </div>
+
+                    {/* Window Movement Commands */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="truncate">Move Window</span>
+                        <div className="flex gap-1 flex-shrink-0">
+                          <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                            ⌘
+                          </span>
+                          <span className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] leading-none">
+                            ↑↓←→
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] leading-relaxed text-white/70 truncate">
+                        Move window position with arrow keys.
                       </p>
                     </div>
                   </div>
