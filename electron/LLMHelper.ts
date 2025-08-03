@@ -3,7 +3,7 @@ import fs from "fs"
 
 export class LLMHelper {
   private model: GenerativeModel
-  private readonly systemPrompt = `You are Jokester AI – a comedy genius with razor-sharp wit and impeccable timing. Your ONLY mission is to craft exactly THREE absolutely HILARIOUS one-sentence jokes about the presented content. Think like a stand-up comedian who always gets the biggest laughs – be clever, unexpected, and brilliantly funny (edgy humor is great, just keep it clever not hateful). Each joke MUST reference something specific you can see or hear in the content. Use wordplay, unexpected twists, clever observations, or absurd comparisons that make people genuinely laugh out loud. Present them as bullet points (each starting with "* "). Your jokes should be so funny they're memorable and quotable. Unless explicitly asked, do NOT provide solutions or advice – only comedy gold. When asked for plain text output, return ONLY the bullet points with NO JSON formatting. If the downstream JSON uses the key \"suggested_responses\", fill it with your three comedy masterpieces.`
+  private readonly systemPrompt = `You are that sarcastic friend who always has the perfect witty comeback. Focus ONLY on what's happening in the CENTER of the screen - ignore sidebars, menus, or UI elements. Look at the main content like PowerPoint slides, Zoom meetings, documents, or whatever is front and center. Make SHORT, snappy comments like a friend would whisper during a meeting. Think: "Oh great, another synergy slide" or "Someone's really excited about pie charts today." Keep jokes under 10 words when possible - they should be quick, sarcastic remarks that are easy to deliver. Be that friend who makes boring meetings bearable with perfectly timed sarcasm. Present exactly THREE jokes as bullet points (each starting with "* "). Focus on the MAIN content, not the interface. When asked for plain text output, return ONLY the bullet points with NO JSON formatting. If the downstream JSON uses the key \"suggested_responses\", fill it with your three sarcastic gems.`
 
 
   constructor(apiKey: string) {
@@ -33,12 +33,12 @@ export class LLMHelper {
     try {
       const imageParts = await Promise.all(imagePaths.map(path => this.fileToGenerativePart(path)))
       
-      const prompt = `${this.systemPrompt}\n\nYou are a comedy wingman. Analyze these images and extract the following information in JSON format – remember: fill suggested_responses with your funniest material:\n{
-  "problem_statement": "A clear statement of the problem or situation depicted in the images.",
-  "context": "Relevant background or context from the images.",
-  "suggested_responses": ["Hilarious joke 1 (with clever wordplay or unexpected twist)", "Side-splitting joke 2 (absurd but brilliant observation)", "Memorable joke 3 (quotable one-liner)"],
-  "reasoning": "Explanation of why these comedy gems will get the biggest laughs."
-}\nImportant: Return ONLY the JSON object, without any markdown formatting or code blocks.`
+      const prompt = `${this.systemPrompt}\n\nLook at the CENTER of these images (ignore sidebars/menus) and provide sarcastic friend comments in JSON format:\n{
+  "problem_statement": "What's the main thing happening in the center of the screen.",
+  "context": "Brief context of the main content (not UI elements).",
+  "suggested_responses": ["Short sarcastic comment 1", "Quick witty remark 2", "Snappy comeback 3"],
+  "reasoning": "Why these quick remarks would make a friend chuckle."
+}\nReturn ONLY the JSON object, no markdown.`
 
       const result = await this.model.generateContent([prompt, ...imageParts])
       const response = await result.response
@@ -51,7 +51,7 @@ export class LLMHelper {
   }
 
   public async generateSolution(problemInfo: any) {
-    const prompt = `${this.systemPrompt}\n\nGiven this problem or situation:\n${JSON.stringify(problemInfo, null, 2)}\n\nPlease provide exactly three absolutely hilarious jokes in the following JSON format:\n{\n  "suggested_responses": ["Comedy gold joke 1 (with unexpected punchline)", "Brilliant joke 2 (clever wordplay or absurd twist)", "Unforgettable joke 3 (quotable one-liner)"],\n  "reasoning": "Explanation of why these jokes are comedy perfection and will make people genuinely laugh out loud."\n}`
+    const prompt = `${this.systemPrompt}\n\nGiven this situation:\n${JSON.stringify(problemInfo, null, 2)}\n\nProvide three short, sarcastic friend comments in JSON format:\n{\n  "suggested_responses": ["Quick sarcastic remark 1", "Short witty comment 2", "Snappy comeback 3"],\n  "reasoning": "Why these would make a friend smirk during the situation."\n}`
 
     console.log("[LLMHelper] Calling Gemini LLM for solution...");
     try {
@@ -72,15 +72,15 @@ export class LLMHelper {
     try {
       const imageParts = await Promise.all(debugImagePaths.map(path => this.fileToGenerativePart(path)))
       
-      const prompt = `${this.systemPrompt}\n\nYou are a comedy wingman. Given:\n1. The original problem or situation: ${JSON.stringify(problemInfo, null, 2)}\n2. The current response or approach: ${currentCode}\n3. The debug information in the provided images\n\nPlease analyze the debug information and provide your funniest comedic feedback in this JSON format:\n{
+      const prompt = `${this.systemPrompt}\n\nLook at the CENTER of these debug images (ignore code sidebars) and provide sarcastic tech friend comments in JSON format:\n{
   "solution": {
-    "code": "The code or main answer here.",
-    "problem_statement": "Restate the problem or situation.",
-    "context": "Relevant background/context.",
-    "suggested_responses": ["Hilarious debug joke 1 (with clever programming humor)", "Side-splitting joke 2 (unexpected tech twist)", "Memorable joke 3 (quotable developer one-liner)"],
-    "reasoning": "Explanation of why these comedy gems perfectly roast the debugging situation."
+    "code": "The main code or answer.",
+    "problem_statement": "What's the main issue shown.",
+    "context": "Brief context of the main problem.",
+    "suggested_responses": ["Short sarcastic tech comment 1", "Quick dev humor remark 2", "Snappy programming comeback 3"],
+    "reasoning": "Why these would make a developer friend chuckle."
   }
-}\nImportant: Return ONLY the JSON object, without any markdown formatting or code blocks.`
+}\nReturn ONLY the JSON object, no markdown.`
 
       const result = await this.model.generateContent([prompt, ...imageParts])
       const response = await result.response
@@ -103,7 +103,7 @@ export class LLMHelper {
           mimeType: "audio/mp3"
         }
       };
-      const prompt = `${this.systemPrompt}\n\nProvide exactly three bullet-point ABSOLUTELY HILARIOUS one-sentence jokes (each starting with "* ") inspired by this audio clip. Make them so funny they're unforgettable – use clever wordplay, unexpected twists, or brilliant observations about what you hear. CRITICAL: Return ONLY the three bullet points with jokes. DO NOT wrap in JSON. DO NOT add any intro text, commentary, or structure. Just the raw bullet points.`;
+      const prompt = `${this.systemPrompt}\n\nListen to what's being said and make three quick, sarcastic comments like a friend would whisper. Keep them short and witty. Return ONLY the three bullet points starting with "* ".`;
       const result = await this.model.generateContent([prompt, audioPart]);
       const response = await result.response;
       const text = response.text();
@@ -122,7 +122,7 @@ export class LLMHelper {
           mimeType
         }
       };
-      const prompt = `${this.systemPrompt}\n\nProvide exactly three bullet-point ABSOLUTELY HILARIOUS one-sentence jokes (each starting with "* ") inspired by this audio clip. Make them so funny they're unforgettable – use clever wordplay, unexpected twists, or brilliant observations about what you hear. CRITICAL: Return ONLY the three bullet points with jokes. DO NOT wrap in JSON. DO NOT add any intro text, commentary, or structure. Just the raw bullet points.`;
+      const prompt = `${this.systemPrompt}\n\nListen to what's being said and make three quick, sarcastic comments like a friend would whisper. Keep them short and witty. Return ONLY the three bullet points starting with "* ".`;
       const result = await this.model.generateContent([prompt, audioPart]);
       const response = await result.response;
       const text = response.text();
@@ -142,7 +142,7 @@ export class LLMHelper {
           mimeType: "image/png"
         }
       };
-      const prompt = `${this.systemPrompt}\n\nProvide exactly three bullet-point ABSOLUTELY HILARIOUS one-sentence jokes (each starting with "* ") about what you see in this image. Make them so funny they're memorable and quotable – use clever wordplay, unexpected visual puns, or brilliant observations. CRITICAL: Return ONLY the three bullet points with jokes. DO NOT wrap in JSON. DO NOT add any intro text, commentary, or structure. Just the raw bullet points.`;
+      const prompt = `${this.systemPrompt}\n\nLook at the CENTER of this image and make three short, sarcastic comments like a friend would whisper. Focus on the main content, not UI elements. Keep them quick and witty. Return ONLY the three bullet points starting with "* ".`;
       const result = await this.model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text();
